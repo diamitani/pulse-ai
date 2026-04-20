@@ -1,31 +1,21 @@
 import OpenAI from 'openai'
 
-export const deepseek = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY!,
-  baseURL: 'https://api.deepseek.com',
-})
-
 export const DEEPSEEK_MODEL = 'deepseek-chat'
 
-export async function streamChat(
-  messages: OpenAI.Chat.ChatCompletionMessageParam[],
-  onChunk: (chunk: string) => void
-) {
-  const stream = await deepseek.chat.completions.create({
-    model: DEEPSEEK_MODEL,
-    messages,
-    stream: true,
-    max_tokens: 2048,
+function getClient() {
+  return new OpenAI({
+    apiKey: process.env.DEEPSEEK_API_KEY!,
+    baseURL: 'https://api.deepseek.com',
   })
+}
 
-  for await (const chunk of stream) {
-    const delta = chunk.choices[0]?.delta?.content ?? ''
-    if (delta) onChunk(delta)
-  }
+export function getDeepSeek() {
+  return getClient()
 }
 
 export async function generateSummary(articlesText: string, date: string): Promise<string> {
-  const response = await deepseek.chat.completions.create({
+  const client = getClient()
+  const response = await client.chat.completions.create({
     model: DEEPSEEK_MODEL,
     messages: [
       {

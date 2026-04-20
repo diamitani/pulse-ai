@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { deepseek, DEEPSEEK_MODEL } from '@/lib/deepseek'
+import { getDeepSeek, DEEPSEEK_MODEL } from '@/lib/deepseek'
 
 export const runtime = 'nodejs'
 export const maxDuration = 60
@@ -43,7 +43,7 @@ If the user asks about something not in the context, say so clearly and share wh
 
   const stream = new ReadableStream({
     async start(controller) {
-      const completion = await deepseek.chat.completions.create({
+      const completion = await getDeepSeek().chat.completions.create({
         model: DEEPSEEK_MODEL,
         messages: [
           { role: 'system', content: systemPrompt },
