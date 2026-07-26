@@ -3,8 +3,8 @@
 import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { Send, Loader2 } from 'lucide-react'
+import ChatMessage from '@/components/ChatMessage'
+import { Send, Loader2, RotateCcw } from 'lucide-react'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -15,12 +15,14 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: "Hey! I'm Pulse, your AI news analyst. Ask me anything about today's AI developments — what's trending, what a specific article means, or how different stories connect.",
+      content:
+        "Hey! I'm Pulse, your AI news analyst. Ask me anything about today's AI developments — what's trending, what a specific article means, or how different stories connect.",
     },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -46,6 +48,10 @@ export default function ChatPage() {
           messages: newMessages.map((m) => ({ role: m.role, content: m.content })),
         }),
       })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
@@ -76,7 +82,7 @@ export default function ChatPage() {
           }
         }
       }
-    } catch (error) {
+    } catch {
       setMessages((prev) => {
         const updated = [...prev]
         updated[updated.length - 1] = {
@@ -97,53 +103,50 @@ export default function ChatPage() {
     }
   }
 
+  function clearChat() {
+    setMessages([
+      {
+        role: 'assistant',
+        content:
+          "Chat cleared. Ask me anything about today's AI developments!",
+      },
+    ])
+  }
+
   return (
     <div className="flex flex-col h-full max-w-3xl mx-auto px-4">
-      {/* Header */}
-      <div className="py-6 border-b border-zinc-800">
-        <h1 className="text-lg font-semibold text-white">Chat with Pulse</h1>
-        <p className="text-zinc-500 text-xs mt-0.5">Ask anything about today&apos;s AI news</p>
+      <div className="py-5 border-b border-zinc-800 flex items-center justify-between">
+        <div>
+          <h1 className="text-lg font-semibold text-white">Chat with Pulse</h1>
+          <p className="text-zinc-500 text-xs mt-0.5">Ask anything about today&apos;s AI news</p>
+        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={clearChat}
+          className="text-zinc-500 hover:text-zinc-300"
+        >
+          <RotateCcw className="h-4 w-4 mr-1.5" />
+          Clear
+        </Button>
       </div>
 
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto py-6 space-y-6">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && (
-              <Avatar className="h-7 w-7 shrink-0 mt-0.5">
-                <AvatarFallback className="bg-blue-600 text-white text-xs">P</AvatarFallback>
-              </Avatar>
-            )}
-            <div
-              className={`max-w-xl rounded-2xl px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed ${
-                msg.role === 'user'
-                  ? 'bg-blue-600 text-white rounded-tr-sm'
-                  : 'bg-zinc-900 text-zinc-200 rounded-tl-sm border border-zinc-800'
-              }`}
-            >
-              {msg.content}
-              {loading && i === messages.length - 1 && msg.role === 'assistant' && !msg.content && (
-                <span className="inline-flex gap-1">
-                  <span className="animate-pulse">·</span>
-                  <span className="animate-pulse delay-100">·</span>
-                  <span className="animate-pulse delay-200">·</span>
-                </span>
-              )}
-            </div>
-            {msg.role === 'user' && (
-              <Avatar className="h-7 w-7 shrink-0 mt-0.5">
-                <AvatarFallback className="bg-zinc-700 text-white text-xs">U</AvatarFallback>
-              </Avatar>
-            )}
-          </div>
+          <ChatMessage
+            key={i}
+            role={msg.role}
+            content={msg.content}
+            isStreaming={loading && i === messages.length - 1 && msg.role === 'assistant'}
+          />
         ))}
         <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
       <div className="py-4 border-t border-zinc-800">
         <div className="flex gap-2 items-end">
           <Textarea
+            ref={textareaRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}

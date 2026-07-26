@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import { LayoutDashboard, Archive, MessageSquare, LogOut, Zap } from 'lucide-react'
+import { LayoutDashboard, Archive, MessageSquare, LogOut, Zap, Rss } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 
 const nav = [
   { href: '/today', icon: LayoutDashboard, label: 'Today' },
   { href: '/archive', icon: Archive, label: 'Archive' },
   { href: '/chat', icon: MessageSquare, label: 'Chat' },
+  { href: '/sources', icon: Rss, label: 'Sources' },
 ]
 
 export default function Sidebar({ user }: { user: User }) {
