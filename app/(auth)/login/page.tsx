@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { Zap } from 'lucide-react'
 
 export default function LoginPage() {
   async function signInWithGoogle() {
@@ -16,10 +17,15 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-950">
       <div className="w-full max-w-sm space-y-8 p-8">
         <div className="text-center">
-          <div className="text-4xl font-bold text-white tracking-tight mb-2">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <div className="h-10 w-10 rounded-xl bg-blue-600 flex items-center justify-center">
+              <Zap className="h-5 w-5 text-white" />
+            </div>
+          </div>
+          <div className="text-3xl font-bold text-white tracking-tight mb-2">
             Pulse<span className="text-blue-500">AI</span>
           </div>
           <p className="text-zinc-400 text-sm">Your daily AI intelligence briefing</p>
@@ -28,7 +34,7 @@ export default function LoginPage() {
         <div className="space-y-3">
           <Button
             onClick={signInWithGoogle}
-            className="w-full bg-white text-black hover:bg-zinc-100 font-medium"
+            className="w-full bg-white text-black hover:bg-zinc-100 font-medium h-11"
             size="lg"
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -41,9 +47,18 @@ export default function LoginPage() {
           </Button>
         </div>
 
-        <p className="text-center text-zinc-600 text-xs">
-          AI news aggregated from 26+ sources, daily.
-        </p>
+        <div className="space-y-3 text-center">
+          <p className="text-zinc-600 text-xs">
+            AI news aggregated from 26+ sources, delivered daily.
+          </p>
+          <div className="flex items-center justify-center gap-4 text-zinc-700 text-xs">
+            <span>RSS Scraping</span>
+            <span className="text-zinc-800">·</span>
+            <span>AI Summaries</span>
+            <span className="text-zinc-800">·</span>
+            <span>Chat</span>
+          </div>
+        </div>
       </div>
     </div>
   )
